@@ -1,0 +1,73 @@
+import random
+
+# Create a deck of cards
+suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
+ranks = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
+values = {'Ace': 11, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'Jack': 10, 'Queen': 10, 'King': 10}
+
+# Function to calculate the total value of a hand
+def calculate_hand_value(hand):
+    value = sum(values[card[1]] for card in hand)
+    # If the hand has an Ace and the value is greater than 21, reduce the Ace's value to 1
+    if value > 21 and any(card[1] == 'Ace' for card in hand):
+        value -= 10
+    return value
+
+# Function to deal a new card from the deck
+def deal_card():
+    suit = random.choice(suits)
+    rank = random.choice(ranks)
+    return (suit, rank)
+
+# Game setup
+player_hand = [deal_card(), deal_card()]
+dealer_hand = [deal_card()]
+
+# Game loop
+while True:
+    print('Player Hand:', player_hand)
+    print('Dealer Hand:', dealer_hand[0])
+
+    # Check if player or dealer has a blackjack
+    player_value = calculate_hand_value(player_hand)
+    dealer_value = calculate_hand_value(dealer_hand)
+    if player_value == 21 and dealer_value == 21:
+        print('Push! Both player and dealer have blackjack.')
+        break
+    elif player_value == 21:
+        print('Player wins with a blackjack!')
+        break
+    elif dealer_value == 21:
+        print('Dealer wins with a blackjack!')
+        break
+
+    # Ask the player to hit or stand
+    choice = input('Do you want to hit or stand? ')
+    if choice.lower() == 'hit':
+        player_hand.append(deal_card())
+        player_value = calculate_hand_value(player_hand)
+        if player_value > 21:
+            print('Player busts! Dealer wins.')
+            break
+    elif choice.lower() == 'stand':
+        while calculate_hand_value(dealer_hand) < 17:
+            dealer_hand.append(deal_card())
+        dealer_value = calculate_hand_value(dealer_hand)
+        print('Dealer Hand:', dealer_hand)
+
+        if dealer_value > 21:
+            print('Dealer busts! Player wins.')
+        elif dealer_value > player_value:
+            print('Dealer wins.')
+        elif dealer_value < player_value:
+            print('Player wins.')
+        else:
+            print('Push! It\'s a tie.')
+        break
+
+    print()
+
+print('Player Hand:', player_hand)
+print('Player Value:', calculate_hand_value(player_hand))
+print('Dealer Hand:', dealer_hand)
+print('Dealer Value:', calculate_hand_value(dealer_hand))
